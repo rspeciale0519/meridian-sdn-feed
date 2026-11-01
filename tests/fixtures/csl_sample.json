@@ -1,0 +1,53 @@
+{
+  "published_at": "2026-10-28T14:03:02Z",
+  "results": [
+    {
+      "id": "999001",
+      "entity_number": "999001",
+      "source": "Specially Designated Nationals (SDN) - Treasury Department",
+      "name": "EXAMPLE CYBER ENTITY",
+      "ids": [
+        {
+          "type": "Digital Currency Address - XBT",
+          "number": "1BoatSLRHtKNngkdXEeobR76b53LETtpyT",
+          "issue_date": null,
+          "expiration_date": null
+        },
+        {
+          "type": "Digital Currency Address - ETH",
+          "number": "0x000000000000000000000000000000000000dEaD",
+          "issue_date": null,
+          "expiration_date": null
+        },
+        {
+          "type": "Passport",
+          "number": "AB1234567"
+        }
+      ]
+    },
+    {
+      "id": "888001",
+      "entity_number": "888001",
+      "source": "Entity List (EL) - Bureau of Industry and Security",
+      "name": "NOT AN SDN",
+      "ids": [
+        {
+          "type": "Digital Currency Address - ETH",
+          "number": "0x1111111111111111111111111111111111111111"
+        }
+      ]
+    },
+    {
+      "id": "999002",
+      "entity_number": "999002",
+      "source": "SDN",
+      "name": "EXAMPLE PERSON, ALICE",
+      "identifiers": [
+        {
+          "scheme": "Digital Currency Address - TRX",
+          "value": "TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx1"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+ent_num,SDN_Name,SDN_Type,Program,Title,Call_Sign,Vess_type,Tonnage,GRT,Vess_flag,Vess_owner,Remarks
+999001,EXAMPLE CYBER ENTITY,Entity,CYBER2,,,,,,,,"Digital Currency Address - XBT 1BoatSLRHtKNngkdXEeobR76b53LETtpyT; Digital Currency Address - ETH 0x000000000000000000000000000000000000dEaD;"
+999002,"EXAMPLE PERSON, ALICE",Individual,CYBER2,,,,,,,,"Digital Currency Address - TRX TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx1;"
+999003,NO CRYPTO HERE,Entity,SDGT,,,,,,,,,,
