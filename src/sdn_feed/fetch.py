@@ -9,7 +9,6 @@ from urllib.parse import urlparse
 
 from sdn_feed.constants import (
     ALLOWED_FETCH_HOSTS,
-    ALLOWED_S3_PREFIX,
     FETCH_RETRIES,
     FETCH_TIMEOUT_S,
     MAX_RESPONSE_BYTES,
@@ -25,10 +24,7 @@ class FetchError(RuntimeError):
 def host_allowed(hostname: str | None) -> bool:
     if not hostname:
         return False
-    host = hostname.lower().rstrip(".")
-    if host in ALLOWED_FETCH_HOSTS:
-        return True
-    return host.startswith(ALLOWED_S3_PREFIX) and host.endswith(".amazonaws.com")
+    return hostname.lower().rstrip(".") in ALLOWED_FETCH_HOSTS
 
 
 def assert_allowed_url(url: str) -> None:

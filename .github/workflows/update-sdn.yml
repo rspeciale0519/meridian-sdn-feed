@@ -41,5 +41,8 @@ jobs:
             exit 0
           fi
           git commit -m "chore: refresh OFAC SDN digital currency addresses"
-          git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" \
+          # Same extraheader form actions/checkout uses. Do not echo BASIC.
+          BASIC="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic ${BASIC}" \
             push origin "HEAD:${GITHUB_REF_NAME}"
+          unset BASIC

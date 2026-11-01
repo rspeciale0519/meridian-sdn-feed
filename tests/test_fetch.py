@@ -36,6 +36,18 @@ class FetchGuardTests(unittest.TestCase):
             assert_allowed_url("https://evil.example/SDN.XML")
         with self.assertRaises(FetchError):
             assert_allowed_url("https://attacker.s3.us-gov-west-1.amazonaws.com/x")
+        # Same bucket name in commercial / other regions must not match.
+        with self.assertRaises(FetchError):
+            assert_allowed_url(
+                "https://wc2h-sls-prod-public-published.s3.amazonaws.com/SDN.XML"
+            )
+        with self.assertRaises(FetchError):
+            assert_allowed_url(
+                "https://wc2h-sls-prod-public-published.s3.us-east-1.amazonaws.com/SDN.XML"
+            )
+        self.assertFalse(
+            host_allowed("wc2h-sls-prod-public-published.s3.us-west-2.amazonaws.com")
+        )
 
     def test_size_cap(self) -> None:
         raw = read_capped(_FakeResponse(b"abc"), limit=10)

@@ -29,7 +29,8 @@ FETCH_TIMEOUT_S = 120
 FETCH_RETRIES = 3
 MAX_RESPONSE_BYTES = 80 * 1024 * 1024  # SDN.XML ~28MB, CSL ~34MB
 
-# HTTPS hosts we will follow (OFAC SLS 302s to a signed S3 object).
+# HTTPS hosts we will follow. OFAC SLS 302s to this exact GovCloud S3 host
+# (the same bucket name is not reserved in commercial AWS).
 ALLOWED_FETCH_HOSTS = frozenset(
     {
         "sanctionslistservice.ofac.treas.gov",
@@ -38,7 +39,6 @@ ALLOWED_FETCH_HOSTS = frozenset(
         "api.trade.gov",
     }
 )
-ALLOWED_S3_PREFIX = "wc2h-sls-prod-public-published.s3."
 
 SOURCE_OFAC_XML = "ofac_sdn_xml"
 SOURCE_OFAC_CSV = "ofac_sdn_csv"
