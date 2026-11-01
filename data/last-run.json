@@ -1,13 +1,17 @@
 {
-  "addresses_written": true,
-  "checked_at": "2026-11-01T04:08:35Z",
+  "addresses_written": false,
+  "checked_at": "2026-11-01T15:50:13Z",
   "count": 1071,
   "csl_cross_check": {
-    "compared": false,
-    "reason": "seed extract; CSL not fetched"
+    "compared": true,
+    "csl_count": 1071,
+    "csl_only": 0,
+    "mismatches": 0,
+    "xml_count": 1071,
+    "xml_only": 0
   },
   "ofac_publish_date": "10/28/2026",
   "payload_sha256": "eb564e51965b334908bbc3dfa3d47e1a5d07f49f585c81823218dcf7bb86ade0",
   "source": "ofac_sdn_xml",
-  "status": "ok"
+  "status": "unchanged"
 }
