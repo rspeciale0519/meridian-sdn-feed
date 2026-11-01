@@ -1,0 +1,39 @@
+name: Update SDN addresses
+
+on:
+  schedule:
+    # Daily around 10:30 UTC. GitHub cron is often hours late.
+    - cron: "30 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sdn-feed-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Extract OFAC digital currency addresses
+        run: python3 scripts/extract_sdn.py --output-dir data
+
+      - name: Commit feed and heartbeat
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/sdn-addresses.json data/sdn-addresses.json.sha256 data/last-run.json
+          if git diff --cached --quiet; then
+            echo "No feed or heartbeat changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: refresh OFAC SDN digital currency addresses"
+          git push

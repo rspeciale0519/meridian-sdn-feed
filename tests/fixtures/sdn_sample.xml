@@ -1,0 +1,62 @@
+<?xml version="1.0" standalone="yes"?>
+<sdnList xmlns="https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/XML">
+  <publshInformation>
+    <Publish_Date>10/28/2026</Publish_Date>
+    <Record_Count>4</Record_Count>
+    <List_Version>SDN</List_Version>
+  </publshInformation>
+  <sdnEntry>
+    <uid>999001</uid>
+    <lastName>EXAMPLE CYBER ENTITY</lastName>
+    <sdnType>Entity</sdnType>
+    <programList>
+      <program>CYBER2</program>
+    </programList>
+    <idList>
+      <id>
+        <uid>1</uid>
+        <idType>Digital Currency Address - XBT</idType>
+        <idNumber>1BoatSLRHtKNngkdXEeobR76b53LETtpyT</idNumber>
+      </id>
+      <id>
+        <uid>2</uid>
+        <idType>Digital Currency Address - ETH</idType>
+        <idNumber>0x000000000000000000000000000000000000dEaD</idNumber>
+      </id>
+      <id>
+        <uid>3</uid>
+        <idType>Passport</idType>
+        <idNumber>AB1234567</idNumber>
+      </id>
+    </idList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>999002</uid>
+    <lastName>EXAMPLE PERSON</lastName>
+    <firstName>ALICE</firstName>
+    <sdnType>Individual</sdnType>
+    <idList>
+      <id>
+        <uid>4</uid>
+        <idType>Digital Currency Address - TRX</idType>
+        <idNumber>TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx1</idNumber>
+      </id>
+      <id>
+        <uid>5</uid>
+        <idType>Digital Currency Address - XBT</idType>
+        <idNumber>1BoatSLRHtKNngkdXEeobR76b53LETtpyT</idNumber>
+      </id>
+    </idList>
+  </sdnEntry>
+  <sdnEntry>
+    <uid>999003</uid>
+    <lastName>NO CRYPTO HERE</lastName>
+    <idList>
+      <id>
+        <uid>6</uid>
+        <idType>National ID No.</idType>
+        <idNumber>12345</idNumber>
+      </id>
+    </idList>
+  </sdnEntry>
+</sdnList>
