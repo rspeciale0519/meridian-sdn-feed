@@ -37,6 +37,7 @@ class EmitTests(unittest.TestCase):
             out = Path(tmp)
             first = write_feed(out, self.result, "2026-11-01T00:00:00Z")
             text_a = (out / "sdn-addresses.json").read_text(encoding="utf-8")
+            self.result.http_last_modified = "Thu, 29 Oct 2026 00:00:00 GMT"
             second = write_feed(out, self.result, "2026-11-01T12:00:00Z")
             text_b = (out / "sdn-addresses.json").read_text(encoding="utf-8")
             self.assertTrue(first["wrote_addresses"])
@@ -44,7 +45,9 @@ class EmitTests(unittest.TestCase):
             self.assertEqual(text_a, text_b)
             heartbeat = json.loads((out / "last-run.json").read_text(encoding="utf-8"))
             self.assertEqual(heartbeat["status"], "unchanged")
-            self.assertEqual(heartbeat["fetched_at"], "2026-11-01T12:00:00Z")
+            self.assertEqual(heartbeat["checked_at"], "2026-11-01T12:00:00Z")
+            self.assertEqual(heartbeat["source"], "ofac_sdn_xml")
+            self.assertEqual(heartbeat["payload_sha256"], first["document"]["payload_sha256"])
             sha = (out / "sdn-addresses.json.sha256").read_text(encoding="utf-8").strip()
             self.assertEqual(sha, first["document"]["payload_sha256"])
 

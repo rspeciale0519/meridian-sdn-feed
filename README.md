@@ -19,17 +19,18 @@ Integrity: `data/sdn-addresses.json.sha256` is the SHA-256 of the sorted `addres
 OFAC tags crypto identifiers as `Digital Currency Address - <CHAIN>` (see [FAQ 563](https://ofac.treasury.gov/faqs/563)). The extractor reads those identifiers from:
 
 1. **Primary:** `SDN.XML` at `https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/SDN.XML`
-2. **Same source, less structured:** `SDN.CSV` remarks, same host
-3. **Fallback:** ITA [Consolidated Screening List](https://www.trade.gov/consolidated-screening-list) JSON at `https://data.trade.gov/downloadable_consolidated_screening_list/v1/consolidated.json`, filtered to OFAC SDN entries only
+2. **Fallback:** ITA [Consolidated Screening List](https://www.trade.gov/consolidated-screening-list) JSON at `https://data.trade.gov/downloadable_consolidated_screening_list/v1/consolidated.json`, filtered to OFAC SDN entries only
 
-If every source is unreachable or malformed, the job **fails** and does **not** overwrite the last good `data/sdn-addresses.json`.
+`SDN.CSV` is **not** used: OFAC truncates the remarks column, so a CSV parse looks valid (~500 rows) and would block fallback. Each source is sanity-checked on its own; a source that fails sanity is skipped rather than failing the job. When both XML and CSL parse, the run records a mismatch count in `last-run.json` and does **not** fail on ordinary CSL lag.
+
+If every source is unreachable, malformed, or fails sanity, the job **fails** and does **not** overwrite the last good `data/sdn-addresses.json`.
 
 ## JSON schema (`data/sdn-addresses.json`)
 
 | Field | Type | Meaning |
 |---|---|---|
 | `schema_version` | string | Document shape. Current: `"1.0"` |
-| `source` | string | Which parser won: `ofac_sdn_xml`, `ofac_sdn_csv`, or `ita_csl_json` |
+| `source` | string | Which parser won: `ofac_sdn_xml` or `ita_csl_json` |
 | `source_urls` | string[] | Official URL(s) that were parsed |
 | `ofac_publish_date` | string | OFAC `Publish_Date` from the XML header (e.g. `10/28/2026`), or CSL publication stamp on fallback |
 | `ofac_list_version` | string | OFAC `List_Version` when present |
@@ -51,21 +52,39 @@ Each `addresses[]` object:
 | `uid` | string | SDN entity uid / entity number when present |
 | `name` | string | SDN primary name when present |
 
-The `addresses` array is sorted by `chain`, then case-insensitive `address`, then `uid`, then `name`. Object keys are sorted. Unchanged OFAC data leaves this file byte-identical; `data/last-run.json` still updates so the public-repo schedule stays alive.
+The `addresses` array is sorted and deduped with the same `pair_key`: chain uppercased; `0x` hex addresses compared case-insensitively; all other addresses compared as published (base58 is case-sensitive). Object keys are sorted. `http_last_modified` and `fetched_at` are **not** part of the identity used to decide a rewrite, so unchanged OFAC data leaves this file byte-identical.
+
+### Freshness: `data/last-run.json`
+
+This file is rewritten on **every successful run**, including quiet weeks when `sdn-addresses.json` does not change. Consumers should treat `checked_at` as “the list was re-fetched and re-verified at this time,” and `payload_sha256` as the current address payload digest.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `checked_at` | string | UTC time this run finished (`YYYY-MM-DDTHH:MM:SSZ`) |
+| `status` | string | `ok` if the addresses file was rewritten, `unchanged` if the payload matched |
+| `source` | string | Parser that passed sanity (`ofac_sdn_xml` or `ita_csl_json`) |
+| `payload_sha256` | string | Same digest as `sdn-addresses.json` |
+| `count` | number | Unique `(chain, address)` rows |
+| `ofac_publish_date` | string | Copied from the feed document |
+| `addresses_written` | boolean | Whether `sdn-addresses.json` was rewritten |
+| `csl_cross_check` | object | If both XML and CSL parsed: `compared`, `xml_count`, `csl_count`, `xml_only`, `csl_only`, `mismatches`. Otherwise `{compared: false, reason}` |
+
+A stale `checked_at` means the scheduled job did not complete, not that OFAC is silent.
 
 ## Sanity guards
 
-A successful run commits only after:
+A successful run commits only after a source passes:
 
 - unique `count` is at least **900**
 - address strings look valid for the labeled chain (format check, not checksum / on-chain proof)
-- unique count has not dropped more than **10%** versus the file already in the repo
+- unique count has not dropped more than **10%** versus the current file
+- no more than **10%** of the previous `(chain, address)` **set** was removed (a same-size swap still fails)
 
-Failures exit non-zero and leave the previous feed in place.
+A corrupt or unreadable current file fails closed (the drop guard is not skipped). Failures exit non-zero and leave the previous feed in place.
 
 ## Schedule
 
-GitHub Actions (`ubuntu-latest`) runs daily at `30 10 * * *` (about 10:30 UTC, often later) and on `workflow_dispatch`. Only the built-in `GITHUB_TOKEN` is used, with `contents: write`. No third-party Actions except `actions/checkout`, pinned to a commit SHA.
+GitHub Actions (`ubuntu-latest`) runs daily at `0 9 * * *` (about 09:00 UTC, often later) and on `workflow_dispatch`, so the feed is usually ready before Meridian (~13:15 UTC). Only the built-in `GITHUB_TOKEN` is used, with `contents: write` on the updater job. No third-party Actions except `actions/checkout`, pinned to a commit SHA.
 
 ## Local use
 

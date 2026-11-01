@@ -1,7 +1,11 @@
 {
   "addresses_written": true,
+  "checked_at": "2026-11-01T03:52:05Z",
   "count": 1071,
-  "fetched_at": "2026-11-01T03:52:05Z",
+  "csl_cross_check": {
+    "compared": false,
+    "reason": "seed extract; CSL not fetched"
+  },
   "ofac_publish_date": "10/28/2026",
   "payload_sha256": "76e8c67fd47fdaf580159a784ccef93a35897dfbbf8a97adb7019d70a673a122",
   "source": "ofac_sdn_xml",

@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 from sdn_feed.constants import MAX_DROP_RATIO, MAX_INVALID_RATIO, MIN_UNIQUE_COUNT
-from sdn_feed.models import AddressRecord, ExtractResult, SanityFailure
+from sdn_feed.models import AddressRecord, ExtractResult, SanityFailure, pair_key
 
 _B58 = r"[1-9A-HJ-NP-Za-km-z]"
 _EVM = re.compile(r"^0x[0-9a-fA-F]{40}$")
@@ -32,7 +32,6 @@ _GENERIC = re.compile(
     r"^[1-9A-HJ-NP-Za-km-z]{16,128}$|^0x[0-9a-fA-F]{40,64}$|^[0-9a-fA-F]{64}$"
 )
 
-# Multi-chain tokens are labeled by OFAC currency, not always the host chain.
 _CHAIN_RES: dict[str, tuple[re.Pattern[str], ...]] = {
     "XBT": (_BTC,),
     "BTC": (_BTC,),
@@ -72,26 +71,34 @@ def invalid_records(records: list[AddressRecord]) -> list[AddressRecord]:
     return [r for r in records if not looks_valid(r)]
 
 
-def load_previous_count(path: Path) -> int | None:
+def result_pairs(result: ExtractResult) -> set[tuple[str, str]]:
+    return {pair_key(r.chain, r.address) for r in result.unique}
+
+
+def load_previous_pairs(path: Path) -> set[tuple[str, str]] | None:
+    """Return previous (chain, address) pairs. Missing file → None. Corrupt → fail."""
     if not path.is_file():
         return None
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None
-    for key in ("unique_count", "count"):
-        value = data.get(key)
-        if isinstance(value, int):
-            return value
-        if isinstance(value, str) and value.isdigit():
-            return int(value)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SanityFailure(
+            f"SANITY FAIL: previous feed is unreadable; refusing to skip drop guard ({exc})"
+        ) from exc
+    if not isinstance(data, dict):
+        raise SanityFailure("SANITY FAIL: previous feed is corrupt (not an object)")
     addresses = data.get("addresses")
-    if isinstance(addresses, list):
-        return len(addresses)
-    return None
+    if not isinstance(addresses, list):
+        raise SanityFailure("SANITY FAIL: previous feed is corrupt (missing addresses array)")
+    pairs: set[tuple[str, str]] = set()
+    for row in addresses:
+        if not isinstance(row, dict) or "address" not in row or "chain" not in row:
+            raise SanityFailure("SANITY FAIL: previous feed is corrupt (bad address row)")
+        pairs.add(pair_key(str(row["chain"]), str(row["address"])))
+    return pairs
 
 
-def assert_sane(result: ExtractResult, previous_count: int | None) -> None:
+def assert_sane(result: ExtractResult, previous_pairs: set[tuple[str, str]] | None) -> None:
     """Raise SanityFailure if the extract is too small, malformed, or a sharp drop."""
     unique = result.unique
     count = len(unique)
@@ -108,10 +115,22 @@ def assert_sane(result: ExtractResult, previous_count: int | None) -> None:
             f"(max {MAX_INVALID_RATIO:.0%}). sample={sample}"
         )
 
-    if previous_count is not None and previous_count > 0:
-        floor = int(previous_count * (1.0 - MAX_DROP_RATIO))
-        if count < floor:
-            raise SanityFailure(
-                f"SANITY FAIL: unique count dropped from {previous_count} to {count} "
-                f"(more than {MAX_DROP_RATIO:.0%}); refusing to overwrite last good file"
-            )
+    if not previous_pairs:
+        return
+
+    prev_count = len(previous_pairs)
+    floor = int(prev_count * (1.0 - MAX_DROP_RATIO))
+    if count < floor:
+        raise SanityFailure(
+            f"SANITY FAIL: unique count dropped from {prev_count} to {count} "
+            f"(more than {MAX_DROP_RATIO:.0%}); refusing to overwrite last good file"
+        )
+
+    new_pairs = result_pairs(result)
+    removed = previous_pairs - new_pairs
+    if prev_count and (len(removed) / prev_count) > MAX_DROP_RATIO:
+        raise SanityFailure(
+            f"SANITY FAIL: removed {len(removed)}/{prev_count} previous "
+            f"(chain, address) pairs (more than {MAX_DROP_RATIO:.0%}); "
+            "refusing to overwrite last good file"
+        )

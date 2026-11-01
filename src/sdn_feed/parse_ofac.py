@@ -8,7 +8,7 @@ import re
 import xml.etree.ElementTree as ET
 
 from sdn_feed.constants import CRYPTO_ID_PREFIX
-from sdn_feed.models import AddressRecord, ExtractResult
+from sdn_feed.models import AddressRecord, ExtractResult, pair_key, record_sort_key
 
 # Remarks in SDN.CSV look like: "Digital Currency Address - XBT 1abc...; ..."
 CSV_ID_RE = re.compile(
@@ -43,7 +43,10 @@ def parse_sdn_xml(xml_text: str, *, source_url: str = "") -> ExtractResult:
     if "<sdnEntry" not in xml_text:
         raise ValueError("OFAC SDN XML is malformed: no <sdnEntry> elements")
 
-    root = ET.fromstring(xml_text)
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise ValueError(f"OFAC SDN XML is malformed: {exc}") from exc
     result = ExtractResult(
         source="ofac_sdn_xml",
         source_urls=[source_url] if source_url else [],
@@ -141,24 +144,12 @@ def parse_sdn_csv(csv_text: str, *, source_url: str = "") -> ExtractResult:
     )
 
 
-def _uid_sort_key(uid: str) -> tuple[int, int, str]:
-    if uid.isdigit():
-        return (0, int(uid), uid)
-    return (1, 0, uid)
-
-
 def unique_records(entries: list[AddressRecord]) -> list[AddressRecord]:
-    """Dedup by (chain, address); keep the lowest uid then name for stability."""
+    """Dedup by pair_key (same rule as sort); keep the lowest uid then name."""
     best: dict[tuple[str, str], AddressRecord] = {}
     for rec in entries:
-        key = (rec.chain.upper(), rec.address)
+        key = pair_key(rec.chain, rec.address)
         prev = best.get(key)
-        if prev is None or (_uid_sort_key(rec.uid), rec.name) < (
-            _uid_sort_key(prev.uid),
-            prev.name,
-        ):
+        if prev is None or record_sort_key(rec) < record_sort_key(prev):
             best[key] = rec
-    return sorted(
-        best.values(),
-        key=lambda r: (r.chain.upper(), r.address.lower(), _uid_sort_key(r.uid), r.name),
-    )
+    return sorted(best.values(), key=record_sort_key)

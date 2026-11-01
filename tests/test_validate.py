@@ -6,12 +6,16 @@ import unittest
 from pathlib import Path
 
 from helpers import eth_record
-from sdn_feed.models import AddressRecord, ExtractResult, SanityFailure
-from sdn_feed.validate import assert_sane, looks_valid
+from sdn_feed.models import AddressRecord, ExtractResult, SanityFailure, pair_key
+from sdn_feed.validate import assert_sane, load_previous_pairs, looks_valid
 
 
 def _result(records: list[AddressRecord]) -> ExtractResult:
     return ExtractResult(source="ofac_sdn_xml", source_urls=[], entries=records, unique=records)
+
+
+def _pairs(records: list[AddressRecord]) -> set[tuple[str, str]]:
+    return {pair_key(r.chain, r.address) for r in records}
 
 
 class FormatTests(unittest.TestCase):
@@ -51,24 +55,49 @@ class SanityTests(unittest.TestCase):
             assert_sane(_result(records), None)
         self.assertIn("fail format", str(ctx.exception))
 
-    def test_rejects_sharp_drop(self) -> None:
+    def test_rejects_sharp_count_drop(self) -> None:
         records = [eth_record(i) for i in range(910)]
+        previous = _pairs([eth_record(i) for i in range(1100)])
         with self.assertRaises(SanityFailure) as ctx:
-            assert_sane(_result(records), 1100)
+            assert_sane(_result(records), previous)
         self.assertIn("dropped", str(ctx.exception))
+
+    def test_rejects_set_removals_even_when_count_holds(self) -> None:
+        previous = [eth_record(i) for i in range(1000)]
+        replacement = [eth_record(i) for i in range(200, 1200)]
+        with self.assertRaises(SanityFailure) as ctx:
+            assert_sane(_result(replacement), _pairs(previous))
+        self.assertIn("removed", str(ctx.exception))
 
     def test_accepts_healthy_extract(self) -> None:
         records = [eth_record(i) for i in range(950)]
-        assert_sane(_result(records), 1000)
+        previous = _pairs([eth_record(i) for i in range(1000)])
+        assert_sane(_result(records), previous)
 
-    def test_previous_count_from_file(self) -> None:
-        from sdn_feed.validate import load_previous_count
-
+    def test_missing_previous_is_ok(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "sdn-addresses.json"
-            self.assertIsNone(load_previous_count(path))
-            path.write_text(json.dumps({"count": 1058, "addresses": []}), encoding="utf-8")
-            self.assertEqual(load_previous_count(path), 1058)
+            self.assertIsNone(load_previous_pairs(path))
+
+    def test_corrupt_previous_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "sdn-addresses.json"
+            path.write_text("{bad", encoding="utf-8")
+            with self.assertRaises(SanityFailure) as ctx:
+                load_previous_pairs(path)
+            self.assertIn("unreadable", str(ctx.exception))
+            path.write_text(json.dumps({"count": 1058, "addresses": ["keep-me"]}), encoding="utf-8")
+            with self.assertRaises(SanityFailure) as ctx:
+                load_previous_pairs(path)
+            self.assertIn("corrupt", str(ctx.exception))
+
+    def test_loads_previous_pairs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "sdn-addresses.json"
+            rows = [eth_record(i).as_payload() for i in range(3)]
+            path.write_text(json.dumps({"count": 3, "addresses": rows}), encoding="utf-8")
+            pairs = load_previous_pairs(path)
+            self.assertEqual(len(pairs or []), 3)
 
 
 if __name__ == "__main__":

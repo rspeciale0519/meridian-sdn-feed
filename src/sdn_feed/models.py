@@ -5,6 +5,21 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
+def pair_key(chain: str, address: str) -> tuple[str, str]:
+    """Identity for sort, dedup, and set-diff. EVM hex is case-insensitive."""
+    chain_u = (chain or "").upper()
+    addr = address or ""
+    if addr.startswith(("0x", "0X")):
+        return (chain_u, addr.lower())
+    return (chain_u, addr)
+
+
+def record_sort_key(record: "AddressRecord") -> tuple:
+    uid = record.uid
+    uid_key = (0, int(uid), uid) if uid.isdigit() else (1, 0, uid)
+    return (*pair_key(record.chain, record.address), uid_key, record.name)
+
+
 @dataclass(frozen=True)
 class AddressRecord:
     address: str

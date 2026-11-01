@@ -6,6 +6,7 @@ SCHEMA_VERSION = "1.0"
 OFAC_SDN_XML_URL = (
     "https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/SDN.XML"
 )
+# SDN.CSV remarks are truncated (~1000 chars); not used as a live source.
 OFAC_SDN_CSV_URL = (
     "https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/SDN.CSV"
 )
@@ -26,6 +27,18 @@ MAX_DROP_RATIO = 0.10
 MAX_INVALID_RATIO = 0.02
 FETCH_TIMEOUT_S = 120
 FETCH_RETRIES = 3
+MAX_RESPONSE_BYTES = 80 * 1024 * 1024  # SDN.XML ~28MB, CSL ~34MB
+
+# HTTPS hosts we will follow (OFAC SLS 302s to a signed S3 object).
+ALLOWED_FETCH_HOSTS = frozenset(
+    {
+        "sanctionslistservice.ofac.treas.gov",
+        "wc2h-sls-prod-public-published.s3.us-gov-west-1.amazonaws.com",
+        "data.trade.gov",
+        "api.trade.gov",
+    }
+)
+ALLOWED_S3_PREFIX = "wc2h-sls-prod-public-published.s3."
 
 SOURCE_OFAC_XML = "ofac_sdn_xml"
 SOURCE_OFAC_CSV = "ofac_sdn_csv"

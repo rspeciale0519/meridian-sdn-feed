@@ -33,6 +33,20 @@ class ParseSdnXmlTests(unittest.TestCase):
             parse_sdn_xml("<html>not sdn</html>")
         with self.assertRaises(ValueError):
             parse_sdn_xml("<sdnList><sdnEntry><uid>1</uid></sdnEntry></sdnList>")
+        with self.assertRaises(ValueError) as ctx:
+            parse_sdn_xml("<sdnList><sdnEntry><uid>1</uid>")
+        self.assertIn("malformed", str(ctx.exception))
+
+    def test_evm_pair_key_is_case_insensitive(self) -> None:
+        from sdn_feed.models import AddressRecord
+
+        mixed = [
+            AddressRecord("0xABCDEFabcdefABCDEFabcdefABCDEFabcdefABCD", "ETH", uid="2"),
+            AddressRecord("0xabcdefabcdefabcdefabcdefabcdefabcdefabcd", "eth", uid="1"),
+        ]
+        unique = unique_records(mixed)
+        self.assertEqual(len(unique), 1)
+        self.assertEqual(unique[0].uid, "1")
 
 
 class ParseSdnCsvTests(unittest.TestCase):
