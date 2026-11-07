@@ -1,17 +1,17 @@
 {
   "addresses_written": true,
-  "checked_at": "2026-11-06T16:37:33Z",
-  "count": 1071,
+  "checked_at": "2026-11-07T15:28:49Z",
+  "count": 1077,
   "csl_cross_check": {
     "compared": true,
-    "csl_count": 1071,
+    "csl_count": 1077,
     "csl_only": 0,
     "mismatches": 0,
-    "xml_count": 1071,
+    "xml_count": 1077,
     "xml_only": 0
   },
-  "ofac_publish_date": "11/05/2026",
-  "payload_sha256": "eb564e51965b334908bbc3dfa3d47e1a5d07f49f585c81823218dcf7bb86ade0",
+  "ofac_publish_date": "11/06/2026",
+  "payload_sha256": "51ba2a0010a1ed0c945874d06f99430fd2db4730bbe200ed99f7d39cbf1af723",
   "source": "ofac_sdn_xml",
   "status": "ok"
 }

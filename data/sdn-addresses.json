@@ -1237,6 +1237,12 @@
       "uid": "18647"
     },
     {
+      "address": "TCreRMzGspdHNEkqkasejS6xTzqXNkYJJZ",
+      "chain": "TRX",
+      "name": "CCC INC",
+      "uid": "59093"
+    },
+    {
       "address": "TCu5onCzXuqxjvVzdB2tR4FLuF66d4yRqf",
       "chain": "TRX",
       "name": "SOKOLOVSKI, Rolan",
@@ -1561,6 +1567,12 @@
       "uid": "18647"
     },
     {
+      "address": "THauYJJEaFGLpEknoKnYmXmT5TCeQGKjDE",
+      "chain": "TRX",
+      "name": "1380079 BC LTD",
+      "uid": "59096"
+    },
+    {
       "address": "THfLaNMBAMz7xXnHoz5BkRMmrwuHKqfAfR",
       "chain": "TRX",
       "name": "ISIL KHORASAN",
@@ -1601,6 +1613,18 @@
       "chain": "TRX",
       "name": "ISIL KHORASAN",
       "uid": "18647"
+    },
+    {
+      "address": "TJHZswisiMgjioAVpmpMSWXCeQGCPjcTMK",
+      "chain": "TRX",
+      "name": "DIVERSE TRADE INC",
+      "uid": "59091"
+    },
+    {
+      "address": "TJT3JZKJWVHVkKRKSmWmg5UYHhAqBM7mfP",
+      "chain": "TRX",
+      "name": "1380079 BC LTD",
+      "uid": "59096"
     },
     {
       "address": "TJdgB1k6ot3f2nLuZug6D8eD3HavTmzmSK",
@@ -1703,6 +1727,12 @@
       "chain": "TRX",
       "name": "ZEDCEX EXCHANGE LTD",
       "uid": "56865"
+    },
+    {
+      "address": "TLyRLCNwBhaXkYak1bTFUYTj72crbgN5Vy",
+      "chain": "TRX",
+      "name": "1380079 BC LTD",
+      "uid": "59096"
     },
     {
       "address": "TM9c5uR2UKwd5fMySgaoYSjphRyi3AjAtc",
@@ -2321,6 +2351,12 @@
       "chain": "TRX",
       "name": "ISIL KHORASAN",
       "uid": "18647"
+    },
+    {
+      "address": "TW5NEaaoPHXC1rt5PaYgG474gQ49oiZ2F5",
+      "chain": "TRX",
+      "name": "2397639 ONTARIO LTD",
+      "uid": "59095"
     },
     {
       "address": "TW5tokvhEfrb77z98Rc8HqbkzQJ6sxYtGX",
@@ -6427,18 +6463,18 @@
       "uid": "29585"
     }
   ],
-  "count": 1071,
-  "entry_count": 1075,
-  "fetched_at": "2026-11-06T16:37:33Z",
-  "http_last_modified": "Thu, 05 Nov 2026 17:30:38 GMT",
+  "count": 1077,
+  "entry_count": 1081,
+  "fetched_at": "2026-11-07T15:28:49Z",
+  "http_last_modified": "Fri, 06 Nov 2026 19:33:15 GMT",
   "ofac_list_version": "",
-  "ofac_publish_date": "11/05/2026",
-  "ofac_record_count": "19555",
-  "payload_sha256": "eb564e51965b334908bbc3dfa3d47e1a5d07f49f585c81823218dcf7bb86ade0",
+  "ofac_publish_date": "11/06/2026",
+  "ofac_record_count": "19563",
+  "payload_sha256": "51ba2a0010a1ed0c945874d06f99430fd2db4730bbe200ed99f7d39cbf1af723",
   "schema_version": "1.0",
   "source": "ofac_sdn_xml",
   "source_urls": [
     "https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/SDN.XML"
   ],
-  "unique_address_count": 1058
+  "unique_address_count": 1064
 }
