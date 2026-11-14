@@ -1,6 +1,6 @@
 {
-  "addresses_written": true,
-  "checked_at": "2026-11-13T16:58:33Z",
+  "addresses_written": false,
+  "checked_at": "2026-11-14T15:37:41Z",
   "count": 1077,
   "csl_cross_check": {
     "compared": true,
@@ -13,5 +13,5 @@
   "ofac_publish_date": "11/13/2026",
   "payload_sha256": "51ba2a0010a1ed0c945874d06f99430fd2db4730bbe200ed99f7d39cbf1af723",
   "source": "ofac_sdn_xml",
-  "status": "ok"
+  "status": "unchanged"
 }
