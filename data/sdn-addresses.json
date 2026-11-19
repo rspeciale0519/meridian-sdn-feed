@@ -2353,6 +2353,12 @@
       "uid": "18647"
     },
     {
+      "address": "TVwLtgUXyDhmcSoQ9x2z9QSua41f8mDFvU",
+      "chain": "TRX",
+      "name": "VARELA VILLAR, Alexandre",
+      "uid": "58806"
+    },
+    {
       "address": "TW5NEaaoPHXC1rt5PaYgG474gQ49oiZ2F5",
       "chain": "TRX",
       "name": "2397639 ONTARIO LTD",
@@ -6463,18 +6469,18 @@
       "uid": "29585"
     }
   ],
-  "count": 1077,
-  "entry_count": 1081,
-  "fetched_at": "2026-11-18T17:50:10Z",
-  "http_last_modified": "Wed, 18 Nov 2026 17:35:50 GMT",
+  "count": 1078,
+  "entry_count": 1082,
+  "fetched_at": "2026-11-19T17:59:44Z",
+  "http_last_modified": "Thu, 19 Nov 2026 14:31:58 GMT",
   "ofac_list_version": "",
-  "ofac_publish_date": "11/18/2026",
-  "ofac_record_count": "19571",
-  "payload_sha256": "51ba2a0010a1ed0c945874d06f99430fd2db4730bbe200ed99f7d39cbf1af723",
+  "ofac_publish_date": "11/19/2026",
+  "ofac_record_count": "19595",
+  "payload_sha256": "cac95155b0578f1fccd4ba85763e064069f72148aaebf75425ac8c6f63b3c147",
   "schema_version": "1.0",
   "source": "ofac_sdn_xml",
   "source_urls": [
     "https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/SDN.XML"
   ],
-  "unique_address_count": 1064
+  "unique_address_count": 1065
 }
